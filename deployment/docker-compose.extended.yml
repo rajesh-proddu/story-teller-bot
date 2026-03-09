@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  # Main bot service with models pre-downloaded
+  story-teller-bot:
+    build:
+      context: ..
+      dockerfile: deployment/Dockerfile
+    container_name: story_teller_bot
+    environment:
+      - LOG_LEVEL=INFO
+      - PYTHONUNBUFFERED=1
+      - HF_HOME=/app/models_cache
+      - HUGGINGFACE_HUB_CACHE=/app/models_cache/hub
+      - TRANSFORMERS_CACHE=/app/models_cache/hub
+      - WHISPER_MODEL=base
+      - TEXT_GENERATION_MODEL=gpt2
+    volumes:
+      - ./logs:/app/logs
+      - ./audio_output:/app/audio_output
+      - ./models_cache:/app/models_cache
+    ports:
+      - "8000:8000"
+    devices:
+      - /dev/snd:/dev/snd
+    cap_add:
+      - SYS_PTRACE
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import src.bot"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    networks:
+      - story_teller_network
+
+  # Testing service
+  tests:
+    build:
+      context: ..
+      dockerfile: deployment/Dockerfile.test
+    container_name: story_teller_bot_tests
+    environment:
+      - PYTHONUNBUFFERED=1
+      - HF_HOME=/app/models_cache
+      - HUGGINGFACE_HUB_CACHE=/app/models_cache/hub
+      - TRANSFORMERS_CACHE=/app/models_cache/hub
+    volumes:
+      - ./logs:/app/logs
+      - ./models_cache:/app/models_cache
+      - ./test_results:/app/test_results
+    cap_add:
+      - SYS_PTRACE
+    networks:
+      - story_teller_network
+    # Enable with: docker-compose -f docker-compose.extended.yml run tests
+
+networks:
+  story_teller_network:
+    driver: bridge

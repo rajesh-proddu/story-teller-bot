@@ -1,0 +1,28 @@
+[Unit]
+Description=Story Teller Bot - AI-powered storytelling for kids
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=%i
+WorkingDirectory=/home/%i/ai_projects/story_teller_bot
+Environment="COMPOSE_PROJECT_NAME=story-teller-bot-%i"
+ExecStartPre=/usr/bin/docker-compose -f deployment/docker-compose.yml pull
+ExecStart=/usr/bin/docker-compose -f deployment/docker-compose.yml up
+ExecStop=/usr/bin/docker-compose -f deployment/docker-compose.yml down
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=story-teller-bot
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/home/%i/ai_projects/story_teller_bot/logs /home/%i/ai_projects/story_teller_bot/audio_output
+
+[Install]
+WantedBy=multi-user.target
