@@ -189,7 +189,7 @@ story_teller_bot/
 │
 ├── requirements.txt              # Python dependencies (20 packages)
 ├── .gitignore                    # Git configuration
-└── run.sh                        # Convenience run script
+└── run.sh                        # Production container manager (start, stop, logs, shell)
 ```
 
 ---

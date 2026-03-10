@@ -53,8 +53,8 @@ story_teller_bot/
 ├── 📦 Dependencies
 │   └── requirements.txt                # Python package list
 │
-└── 🎬 Scripts
-    └── run.sh                         # Quick run script
+└── 🛠️ Scripts
+    └── run.sh                         # Production container manager
 ```
 
 ## Directory Descriptions
@@ -235,10 +235,10 @@ Build/Test Tools:
 
 ### Step 1: Choose Your Setup Method
 ```
-Option 1: Automatic      → ./deployment/setup.sh → ./run.sh
-Option 2: Docker         → docker-compose up
-Option 3: Manual         → Read QUICKSTART.md
-Option 4: Windows        → Read WINDOWS.md
+Option 1: Setup + Manager → ./deployment/setup.sh → ./run.sh start
+Option 2: Docker Compose  → docker-compose -f deployment/docker-compose.yml up
+Option 3: Manual          → Read QUICKSTART.md
+Option 4: Windows         → Read WINDOWS.md
 ```
 
 ### Step 2: Choose Your Reading Path
@@ -252,13 +252,13 @@ Windows User → WINDOWS.md → Others
 ### Step 3: Verify Installation
 ```bash
 # Run tests
-make test
+docker-compose -f deployment/docker-compose.yml exec story-teller-bot pytest tests/
 
 # Start bot
-python -m src.bot
+./run.sh start
 
-# Or use the run script
-./run.sh
+# View logs
+./run.sh logs
 ```
 
 ---
@@ -274,8 +274,10 @@ python -m src.bot
 | Development | DEVELOPMENT.md |
 | GitHub setup | GITHUB_SETUP.md |
 | Completion summary | PROJECT_COMPLETION.md |
-| Run bot | ./run.sh or `python -m src.bot` |
-| Run tests | `make test` or `pytest tests/` |
+| Run bot | `./run.sh start` |
+| Stop bot | `./run.sh stop` |
+| Run tests | `docker-compose exec ... pytest` |
+| View logs | `./run.sh logs` |
 | Settings | config/settings.py or .env |
 | Deploy | deployment/setup.sh |
 The deployment folder contains all Docker and production deployment configuration:

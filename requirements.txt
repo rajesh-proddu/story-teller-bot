@@ -2,10 +2,8 @@ torch==2.0.1
 transformers==4.30.0
 sounddevice==0.4.5
 soundfile==0.12.1
-wave==0.0.2
 SpeechRecognition==3.10.0
 pyttsx3==2.90
-openai-whisper==20230314
 pydub==0.25.1
 python-dotenv==1.0.0
 pytest==7.3.1
@@ -14,6 +12,6 @@ black==23.3.0
 flake8==6.0.0
 mypy==1.0.1
 pydantic==2.0.0
+pydantic-settings==2.0.0
 loguru==0.7.0
 numpy==1.24.3
-librosa==0.10.0

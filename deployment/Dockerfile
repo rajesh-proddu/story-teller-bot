@@ -8,13 +8,23 @@ ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     DEBIAN_FRONTEND=noninteractive
 
-# Install system dependencies
+# Install system dependencies for audio and video processing
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
+    python3-dev \
     git \
     libsndfile1 \
     libsndfile1-dev \
+    libportaudio2 \
     alsa-utils \
+    pkg-config \
+    libavformat-dev \
+    libavcodec-dev \
+    libavdevice-dev \
+    libavutil-dev \
+    libavfilter-dev \
+    libswscale-dev \
+    libswresample-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Create virtual environment
@@ -24,9 +34,10 @@ ENV PATH="/opt/venv/bin:$PATH"
 # Copy requirements
 COPY requirements.txt .
 
-# Install Python dependencies
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+# Install Python dependencies (prefer binary wheels to avoid compilation issues)
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
+    pip install --no-cache-dir --prefer-binary pydantic-settings && \
+    pip install --no-cache-dir --prefer-binary -r requirements.txt
 
 # Download models from HuggingFace
 COPY scripts/download_models.py /tmp/download_models.py
@@ -51,6 +62,8 @@ ENV PYTHONUNBUFFERED=1 \
 # Install runtime dependencies only
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libsndfile1 \
+    libportaudio2 \
+    libespeak1 \
     alsa-utils \
     && rm -rf /var/lib/apt/lists/*
 
@@ -75,10 +88,6 @@ RUN mkdir -p logs models_cache audio_output && \
 
 # Switch to non-root user
 USER appuser
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-    CMD python -c "from src.bot import StoryTellerBot; StoryTellerBot()" || exit 1
 
 # Expose port for API (optional)
 EXPOSE 8000

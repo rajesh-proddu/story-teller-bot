@@ -73,9 +73,13 @@ class TestAudioInputHandler:
 
 class TestAudioOutputHandler:
     """Test AudioOutputHandler class."""
-    
-    def test_initialization(self):
+
+    @patch('pyttsx3.init')
+    def test_initialization(self, mock_engine):
         """Test handler initialization."""
+        mock_tts = MagicMock()
+        mock_engine.return_value = mock_tts
+
         handler = AudioOutputHandler()
         assert handler.is_playing is False
         assert handler.engine is not None
@@ -95,13 +99,17 @@ class TestAudioOutputHandler:
     @patch('soundfile.read')
     @patch('sounddevice.play')
     @patch('sounddevice.wait')
-    def test_play_audio(self, mock_wait, mock_play, mock_read):
+    @patch('pyttsx3.init')
+    def test_play_audio(self, mock_engine, mock_wait, mock_play, mock_read):
         """Test playing audio file."""
+        mock_tts = MagicMock()
+        mock_engine.return_value = mock_tts
         mock_audio_data = np.random.randn(16000, 1).astype(np.float32)
         mock_read.return_value = (mock_audio_data, 16000)
-        
+
         handler = AudioOutputHandler()
+        handler.engine = mock_tts
         handler.play_audio(Path("test.wav"))
-        
+
         mock_play.assert_called_once()
         mock_wait.assert_called_once()

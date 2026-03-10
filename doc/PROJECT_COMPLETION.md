@@ -191,13 +191,14 @@ A complete, production-ready Story Teller Bot for kids has been developed follow
   - Code quality checks
   - Build verification
 
-### 8. **Executable Scripts**
+### 8. **run.sh - Container Manager**
 
-- **`run.sh`** (65 lines)
-  - Easy bot launching
-  - Auto virtual environment activation
-  - Model management
-  - Status messages
+- **`run.sh`** (container management commands)
+  - `./run.sh start` - Start bot containers
+  - `./run.sh stop` - Stop bot containers
+  - `./run.sh logs` - View live logs
+  - `./run.sh shell` - Get interactive shell
+  - `./run.sh status` - Check container status
 
 - **`deployment/setup.sh`** (100+ lines)
   - Complete environment setup
@@ -282,20 +283,20 @@ A complete, production-ready Story Teller Bot for kids has been developed follow
 
 ## 🚀 Quick Start
 
-### Installation (3 options)
+### Installation & Running
 
-**Option 1: Automatic (Linux/macOS)**
+**Option 1: Setup + Run**
 ```bash
 ./deployment/setup.sh
-./run.sh
+./run.sh start
 ```
 
-**Option 2: Docker**
+**Option 2: Docker Compose directly**
 ```bash
-docker-compose up
+docker-compose -f deployment/docker-compose.yml up
 ```
 
-**Option 3: Quick Docker Compose**
+**Option 3: Quick start**
 ```bash
 docker-compose -f deployment/docker-compose.yml up --build
 ```

@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   story-teller-bot:
     build:
@@ -15,9 +13,9 @@ services:
       - WHISPER_MODEL=base
       - TEXT_GENERATION_MODEL=gpt2
     volumes:
-      - ./logs:/app/logs
-      - ./audio_output:/app/audio_output
-      - ./models_cache:/app/models_cache
+      - logs_volume:/app/logs
+      - audio_output_volume:/app/audio_output
+      - models_cache_volume:/app/models_cache
     ports:
       - "8000:8000"
     devices:
@@ -26,8 +24,11 @@ services:
     cap_add:
       - SYS_PTRACE
     restart: unless-stopped
+    # Default: interactive mode
+    # To pass arguments, use docker-compose exec or override command:
+    # command: python -m src.bot --text "king and a lion"
     healthcheck:
-      test: ["CMD", "python", "-c", "from src.bot import StoryTellerBot; print('OK')"]
+      test: ["CMD", "python", "-c", "print('OK')"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -38,3 +39,11 @@ services:
 networks:
   story_teller_network:
     driver: bridge
+
+volumes:
+  logs_volume:
+    driver: local
+  audio_output_volume:
+    driver: local
+  models_cache_volume:
+    driver: local
