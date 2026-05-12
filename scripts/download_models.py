@@ -27,23 +27,41 @@ def download_models():
     
     models_to_download = [
         {
-            'name': 'Whisper Base (Speech Recognition)',
-            'source': 'openai/whisper-base',
-            'download_fn': download_whisper_model,
-            'size': '~140MB'
+            'name': 'Whisper Small (Better Accuracy)',
+            'source': 'openai/whisper-small',
+            'download_fn': download_whisper_model, 
+            'size': '~460MB'
         },
         {
-            'name': 'GPT-2 (Story Generation)',
-            'source': 'gpt2',
-            'download_fn': download_gpt2_model,
-            'size': '~540MB'
+            'name': 'TinyLlama 1.1B (Modern Storytelling)',
+            'source': 'TinyLlama/TinyLlama-1.1B-Chat-v1.0',
+            'download_fn': download_hf_model, # Use your HuggingFace download function
+            'size': '~2.2GB'
         },
         {
-            'name': 'DistilGPT-2 (Alternative, Smaller)',
-            'source': 'distilgpt2',
-            'download_fn': download_distilgpt2_model,
-            'size': '~160MB'
+            'name': 'Phi-2 (Very Smart / High Quality)',
+            'source': 'microsoft/phi-2',
+            'download_fn': download_hf_model,
+            'size': '~5GB'
         },
+        # {
+        #     'name': 'Whisper Base (Speech Recognition)',
+        #     'source': 'openai/whisper-base',
+        #     'download_fn': download_whisper_model,
+        #     'size': '~140MB'
+        # },
+        # {
+        #     'name': 'GPT-2 (Story Generation)',
+        #     'source': 'gpt2',
+        #     'download_fn': download_gpt2_model,
+        #     'size': '~540MB'
+        # },
+        # {
+        #     'name': 'DistilGPT-2 (Alternative, Smaller)',
+        #     'source': 'distilgpt2',
+        #     'download_fn': download_distilgpt2_model,
+        #     'size': '~160MB'
+        # },
     ]
     
     success_count = 0
@@ -55,7 +73,7 @@ def download_models():
             print(f"  Source: {model_info['source']}")
             print(f"  Size: {model_info['size']}")
             
-            model_info['download_fn']()
+            model_info['download_fn'](model_info['source'])
             
             print(f"  ✓ Downloaded successfully")
             success_count += 1
@@ -77,17 +95,27 @@ def download_models():
     return failed_count == 0
 
 
-def download_whisper_model():
+# def download_whisper_model():
+#     """Download Whisper speech recognition model."""
+#     try:
+#         import whisper
+#         model = whisper.load_model("base", download_root=str(Path("/app/models_cache")))
+#         print(f"    Model type: {type(model)}")
+#         print(f"    Loaded successfully")
+#     except Exception as e:
+#         print(f"    Error: {e}")
+#         raise
+
+def download_whisper_model(model_name="small"):
     """Download Whisper speech recognition model."""
     try:
         import whisper
-        model = whisper.load_model("base", download_root=str(Path("/app/models_cache")))
+        model = whisper.load_model("small", download_root=str(Path("/app/models_cache")))
         print(f"    Model type: {type(model)}")
         print(f"    Loaded successfully")
     except Exception as e:
         print(f"    Error: {e}")
         raise
-
 
 def download_gpt2_model():
     """Download GPT-2 story generation model."""
@@ -122,6 +150,32 @@ def download_distilgpt2_model():
         print(f"    Model: {type(model).__name__}")
     except Exception as e:
         print(f"    Error: {e}")
+        raise
+
+
+def download_hf_model(model_id = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"):
+    """
+    Download a generic Hugging Face model and tokenizer.
+    
+    Args:
+        model_id: The Hugging Face model identifier (e.g., 'TinyLlama/TinyLlama-1.1B-Chat-v1.0')
+    """
+    try:
+        from transformers import AutoTokenizer, AutoModelForCausalLM
+        
+        print(f"    Target Model: {model_id}")
+        print("    Downloading tokenizer...")
+        tokenizer = AutoTokenizer.from_pretrained(model_id)
+        
+        print("    Downloading model (this may take a while)...")
+        model = AutoModelForCausalLM.from_pretrained(model_id)
+        
+        print(f"    Tokenizer: {type(tokenizer).__name__}")
+        print(f"    Model: {type(model).__name__}")
+        print(f"    Successfully cached {model_id}")
+        
+    except Exception as e:
+        print(f"    Error downloading {model_id}: {e}")
         raise
 
 

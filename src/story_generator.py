@@ -33,7 +33,7 @@ class StoryGenerator:
 
             # Load tokenizer and model
             self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
-            self.model = AutoModelForCausalLM.from_pretrained(self.model_name)
+            self.model = AutoModelForCausalLM.from_pretrained(self.model_name, ignore_mismatched_sizes=True)
 
             # Create pipeline
             self.pipeline = pipeline("text-generation", model=self.model, tokenizer=self.tokenizer, device=-1)  # CPU
