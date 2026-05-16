@@ -1,0 +1,102 @@
+[
+  {
+    "id": "p01",
+    "prompt": "a cat and a dog",
+    "tags": ["simple", "animals"]
+  },
+  {
+    "id": "p02",
+    "prompt": "a friendly bunny in a garden",
+    "tags": ["simple", "animals", "garden"]
+  },
+  {
+    "id": "p03",
+    "prompt": "a knight and a dragon in a castle",
+    "tags": ["medium", "fantasy_creatures", "humans"]
+  },
+  {
+    "id": "p04",
+    "prompt": "a curious squirrel exploring a deep forest",
+    "tags": ["medium", "animals", "forest"]
+  },
+  {
+    "id": "p05",
+    "prompt": "a little mermaid and a talking fish underwater",
+    "tags": ["medium", "fantasy_creatures", "underwater"]
+  },
+  {
+    "id": "p06",
+    "prompt": "an astronaut and a friendly alien on the moon",
+    "tags": ["medium", "humans", "fantasy_creatures", "space"]
+  },
+  {
+    "id": "p07",
+    "prompt": "a young chef and a magic spoon in a busy kitchen",
+    "tags": ["medium", "humans", "objects_as_characters", "kitchen"]
+  },
+  {
+    "id": "p08",
+    "prompt": "a shy new student making friends at school",
+    "tags": ["medium", "humans", "school"]
+  },
+  {
+    "id": "p09",
+    "prompt": "three friends finding a magic map and a hidden treasure",
+    "tags": ["complex", "humans", "adventure"]
+  },
+  {
+    "id": "p10",
+    "prompt": "a wizard, a princess, and a clever fox saving a village from a storm",
+    "tags": ["complex", "fantasy_creatures", "humans", "animals"]
+  },
+  {
+    "id": "p11",
+    "prompt": "two siblings building a submarine to explore underwater caves",
+    "tags": ["complex", "humans", "underwater"]
+  },
+  {
+    "id": "p12",
+    "prompt": "a robot, a star, and a comet racing across the galaxy",
+    "tags": ["complex", "objects_as_characters", "space"]
+  },
+  {
+    "id": "p13",
+    "prompt": "a teapot and a teacup who want to throw a party in the kitchen",
+    "tags": ["medium", "objects_as_characters", "kitchen"]
+  },
+  {
+    "id": "p14",
+    "prompt": "a pencil and an eraser solving a mystery at school",
+    "tags": ["medium", "objects_as_characters", "school"]
+  },
+  {
+    "id": "p15",
+    "prompt": "balloon",
+    "tags": ["edge_case", "single_object", "objects_as_characters"]
+  },
+  {
+    "id": "p16",
+    "prompt": "kindness",
+    "tags": ["edge_case", "abstract_concept"]
+  },
+  {
+    "id": "p17",
+    "prompt": "friendship",
+    "tags": ["edge_case", "abstract_concept"]
+  },
+  {
+    "id": "p18",
+    "prompt": "a brave kid alone at night",
+    "tags": ["edge_case", "borderline_scary", "safety_check"]
+  },
+  {
+    "id": "p19",
+    "prompt": "a small mouse hiding from a thunderstorm in the forest",
+    "tags": ["edge_case", "borderline_scary", "animals", "forest"]
+  },
+  {
+    "id": "p20",
+    "prompt": "a unicorn, a phoenix, and a baby dinosaur on a quest for a rainbow",
+    "tags": ["complex", "fantasy_creatures", "animals"]
+  }
+]

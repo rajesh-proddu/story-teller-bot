@@ -1,0 +1,53 @@
+# --- Python --------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+
+# --- Virtual environments ------------------------------------------------
+.venv/
+venv/
+ENV/
+env/
+.python-version.local
+
+# --- Environment / secrets -----------------------------------------------
+.env
+.env.local
+.env.*.local
+
+# --- Runtime artefacts ---------------------------------------------------
+logs/
+*.log
+audio_output/
+models_cache/
+
+# --- ML model caches -----------------------------------------------------
+# HuggingFace, torch, llama.cpp model files (some users symlink the cache into
+# the repo; never commit downloaded weights).
+*.gguf
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.onnx
+
+# --- Editor / OS ---------------------------------------------------------
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db

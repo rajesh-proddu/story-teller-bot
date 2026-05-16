@@ -39,6 +39,140 @@ This will:
 
 That's it! The bot is ready to use.
 
+### Running on Windows with pyenv-win (Native, No Docker)
+
+For running the bot directly on Windows using [pyenv-win](https://github.com/pyenv-win/pyenv-win)
+to manage the Python version. The project pins Python **3.10.11** in `.python-version`.
+
+#### 1. Install pyenv-win
+
+Open **PowerShell** (as your normal user, not admin) and run:
+
+```powershell
+Invoke-WebRequest -UseBasicParsing -Uri "https://raw.githubusercontent.com/pyenv-win/pyenv-win/master/pyenv-win/install-pyenv-win.ps1" -OutFile "./install-pyenv-win.ps1"
+&"./install-pyenv-win.ps1"
+```
+
+Close and reopen PowerShell, then verify:
+
+```powershell
+pyenv --version
+```
+
+If `pyenv` is not recognized, add these to your user `PATH` environment variable
+(System Properties -> Environment Variables):
+
+```
+%USERPROFILE%\.pyenv\pyenv-win\bin
+%USERPROFILE%\.pyenv\pyenv-win\shims
+```
+
+#### 2. Install Python 3.10.11
+
+```powershell
+pyenv update
+pyenv install 3.10.11
+```
+
+#### 3. Clone and pin the Python version
+
+```powershell
+git clone https://github.com/YOUR_USERNAME/story-teller-bot.git
+cd story-teller-bot
+
+# .python-version already pins 3.10.11; this just confirms pyenv picks it up
+pyenv local 3.10.11
+python --version    # should print: Python 3.10.11
+```
+
+#### 4. Create a virtual environment and install dependencies
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+
+# Required by spaCy NER entity extraction
+python -m spacy download en_core_web_sm
+```
+
+Notes:
+- `bitsandbytes` (4-bit LLM quantization) is **skipped automatically on Windows**
+  via a marker in `requirements.txt`. The bot falls back to fp32 — slower but works.
+- If `Activate.ps1` is blocked, allow scripts for the current user once:
+  `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned`.
+
+#### 5. Install espeak-ng (required by Kokoro TTS)
+
+Kokoro is the primary TTS engine and uses **espeak-ng** for English grapheme-to-phoneme.
+Download the latest Windows installer from
+https://github.com/espeak-ng/espeak-ng/releases and run it. Then either add
+`C:\Program Files\eSpeak NG` to your `PATH`, or set this env var so the
+`phonemizer` library can find the DLL:
+
+```powershell
+$env:PHONEMIZER_ESPEAK_LIBRARY = "C:\Program Files\eSpeak NG\libespeak-ng.dll"
+```
+
+If you skip this step, Kokoro will fail to initialize and the bot will fall back
+to **Piper** then **pyttsx3** automatically (the chain is configured in
+`config/settings.py`).
+
+#### 6. Configure environment (optional)
+
+Create a `.env` file in the project root to override defaults:
+
+```env
+# Use a CPU-friendly GGUF model via llama-cpp-python (recommended on Windows
+# without a CUDA GPU — e.g. Intel Core Ultra). ~2 GB RAM, ~5-15s per generation.
+STORY_BACKEND=llama_cpp
+
+# Alternative: use Anthropic Claude (fastest, needs API key)
+# STORY_BACKEND=anthropic
+# ANTHROPIC_API_KEY=sk-ant-...
+
+# Print every LLM call's prompt + response to stdout (debugging)
+LOG_LLM_CALLS=true
+
+# Run the critique-revise loop N times after the first draft
+STORY_REFINEMENT_ROUNDS=1
+```
+
+The `llama_cpp` backend auto-downloads `Phi-3-mini-4k-instruct-q4.gguf` (~2.3 GB)
+from HuggingFace on first run and caches it under
+`%USERPROFILE%\.cache\huggingface\`. To use a different GGUF, set
+`LLAMA_CPP_MODEL_PATH=C:\path\to\model.gguf` in `.env`.
+
+#### 7. Run the bot
+
+From the project root with the venv activated:
+
+```powershell
+# Interactive menu (audio / text / continue / exit)
+python -m src.bot
+
+# One-shot, non-interactive
+python -m src.bot --text "a brave knight and a friendly dragon"
+
+# Generate without speaking the result
+python -m src.bot --text "a brave knight and a friendly dragon" --no-play
+```
+
+First run downloads model weights (Phi-3-mini ~2.3 GB, distil-whisper ~250 MB,
+Kokoro ~330 MB) into `models_cache/` and the HuggingFace cache under
+`%USERPROFILE%\.cache\huggingface`. Subsequent runs start in seconds.
+
+#### Windows native — common gotchas
+
+- **Microphone permission**: Windows may prompt the first time `sounddevice`
+  opens the mic. Allow it under Settings -> Privacy -> Microphone.
+- **WSL note**: If you are on WSL and want native audio, run from PowerShell
+  using pyenv-win as above. Audio passthrough from WSL is finicky.
+- **Faster startup**: Set `STORY_BACKEND=anthropic` to skip loading the
+  local 3.8B-parameter LLM entirely.
+
 ## Usage
 
 ### Running the Bot with Docker (Recommended)

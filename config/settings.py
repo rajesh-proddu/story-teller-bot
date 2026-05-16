@@ -1,66 +1,97 @@
-"""
-Configuration module for Story Teller Bot.
-"""
+"""Application configuration."""
 import os
 from pathlib import Path
 from typing import Optional
+
 from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
     """Application settings."""
-    
-    # Project paths
+
     PROJECT_ROOT: Path = Path(__file__).parent.parent
     LOGS_DIR: Path = PROJECT_ROOT / "logs"
     MODELS_CACHE_DIR: Path = PROJECT_ROOT / "models_cache"
     AUDIO_OUTPUT_DIR: Path = PROJECT_ROOT / "audio_output"
-    
-    # Audio settings
+
     SAMPLE_RATE: int = 16000
-    AUDIO_DURATION_SECONDS: int = 15  # Max recording duration
-    CHANNELS: int = 1  # Mono
-    
+    AUDIO_DURATION_SECONDS: int = 15
+    CHANNELS: int = 1
 
-    # Model settings
-    # WHISPER_MODEL: str = "base"  # tiny, base, small, medium, large
-    # TEXT_GENERATION_MODEL: str = "gpt2"  # Using open-source model
-    # TTS_ENGINE: str = "pyttsx3"  # Text-to-speech engine
-    
-    # # Story generation settings
-    # MAX_STORY_LENGTH: int = 500  # Max words in story
-    # TEMPERATURE: float = 0.7
-    # TOP_P: float = 0.9
-    
-    # Much better accuracy for voice-to-text
-    WHISPER_MODEL: str = "small"  # 'small' is the sweet spot for CPU
+    # distil-small.en: ~6x faster than whisper-small at near-equal English WER.
+    WHISPER_MODEL: str = "distil-small.en"
 
-    # GPT-2 is very old; TinyLlama or Phi-2 are modern and much smarter
-    TEXT_GENERATION_MODEL: str = "TinyLlama/TinyLlama-1.1B-Chat-v1.0" 
-    TTS_ENGINE: str = "pyttsx3"  # Using pyttsx3 for offline TTS
+    # Story-generation backend: "local" (HuggingFace), "anthropic" (Claude API),
+    # or "llama_cpp" (GGUF via llama-cpp-python; CPU-friendly, no CUDA needed).
+    STORY_BACKEND: str = "local"
 
-    MAX_STORY_LENGTH: int = 250  # Keep it concise for better quality
-    TEMPERATURE: float = 0.8     # Slightly higher for more creative wording
-    TOP_P: float = 0.95          # Look at more word options
+    # Default local model. Phi-3-mini is small, fast on CPU with 4-bit quant, and a
+    # solid step up from TinyLlama in narrative coherence.
+    TEXT_GENERATION_MODEL: str = "microsoft/Phi-3-mini-4k-instruct"
 
-    # Logging
+    # 4-bit quantization via bitsandbytes. Silently falls back to fp32 if unavailable.
+    USE_QUANTIZATION: bool = True
+
+    # Anthropic backend config (used when STORY_BACKEND == "anthropic").
+    ANTHROPIC_MODEL: str = "claude-haiku-4-5-20251001"
+    ANTHROPIC_API_KEY: Optional[str] = None
+
+    # llama-cpp-python (GGUF) backend config. Either set LLAMA_CPP_MODEL_PATH to a
+    # local .gguf file, or leave it empty and the model will be pulled from
+    # HF Hub using REPO+FILE (cached under ~/.cache/huggingface/).
+    LLAMA_CPP_MODEL_PATH: Optional[str] = None
+    LLAMA_CPP_MODEL_REPO: str = "microsoft/Phi-3-mini-4k-instruct-gguf"
+    LLAMA_CPP_MODEL_FILE: str = "Phi-3-mini-4k-instruct-q4.gguf"
+    LLAMA_CPP_N_CTX: int = 4096
+    # None lets llama.cpp pick a sensible default (typically all physical cores).
+    LLAMA_CPP_N_THREADS: Optional[int] = None
+
+    # TTS chain: "kokoro" -> "piper" -> "pyttsx3". The chosen engine is
+    # the first one in the chain starting at TTS_ENGINE that initializes.
+    TTS_ENGINE: str = "kokoro"
+    KOKORO_VOICE: str = "af_heart"
+    KOKORO_LANG: str = "a"  # 'a' = American English, 'b' = British English
+
+    # Interpreted as max_new_tokens for the generate call.
+    MAX_STORY_LENGTH: int = 400
+    TEMPERATURE: float = 0.8
+    TOP_P: float = 0.95
+
+    # Story content controls.
+    DEFAULT_AGE_RANGE: str = "5-8"
+    DEFAULT_TONE: str = "adventurous"
+    STRUCTURED_GENERATION: bool = True
+    CONVERSATION_HISTORY_LIMIT: int = 4
+
+    # Critique-revise refinement. 0 = off (default).
+    # Each round adds ~2x the inference cost of a single generation.
+    STORY_REFINEMENT_ROUNDS: int = 0
+
+    # When True, every LLM call's input messages and output response are
+    # printed to stdout. Useful for debugging prompts and refinement loops.
+    LOG_LLM_CALLS: bool = False
+
     LOG_LEVEL: str = "INFO"
-    LOG_FORMAT: str = "<level>{level: <8}</level> | <cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>"
-    
-    # API settings
+    LOG_FORMAT: str = (
+        "<level>{level: <8}</level> | <cyan>{name}</cyan>:"
+        "<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>"
+    )
+
     ENABLE_API: bool = False
     API_PORT: int = 8000
-    
+
     class Config:
-        """Pydantic config."""
         env_file = ".env"
         case_sensitive = False
-    
+        extra = "ignore"
+
     def __post_init__(self) -> None:
-        """Create required directories."""
         self.LOGS_DIR.mkdir(parents=True, exist_ok=True)
         self.MODELS_CACHE_DIR.mkdir(parents=True, exist_ok=True)
         self.AUDIO_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 
 settings = Settings()
+
+for _dir in (settings.LOGS_DIR, settings.MODELS_CACHE_DIR, settings.AUDIO_OUTPUT_DIR):
+    _dir.mkdir(parents=True, exist_ok=True)
