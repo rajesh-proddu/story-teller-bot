@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c ' *)",
+      "Bash(python3 -c ' *)",
+      "Bash(python3)",
+      "Bash(python3 -c \"import ast; ast.parse\\(open\\('src/story_generator.py'\\).read\\(\\)\\); ast.parse\\(open\\('config/settings.py'\\).read\\(\\)\\); print\\('OK'\\)\")",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)"
+    ]
+  }
+}
